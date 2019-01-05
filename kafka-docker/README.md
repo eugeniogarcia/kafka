@@ -1,6 +1,8 @@
 # Before starting
-git config --global core.autocrlf false 
-and then clone the repo
+When building the docker compose we´ll get an error unless we do this before cloning the repo:
+git config --global core.autocrlf false
+
+Then we can clone the repo.
 
 kafka-docker
 ============
