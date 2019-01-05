@@ -1,5 +1,6 @@
 # Before starting
 When building the docker compose we´ll get an error unless we do this before cloning the repo:
+
 git config --global core.autocrlf false
 
 Then we can clone the repo.
