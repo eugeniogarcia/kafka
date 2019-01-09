@@ -5,6 +5,22 @@ git config --global core.autocrlf false
 
 Then we can clone the repo.
 
+#How to check that the setup is right
+## Create and verify a topic:
+
+docker exec f88c7614beee /opt/kafka/bin/kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic test
+
+docker exec f88c7614beee /opt/kafka/bin/kafka-topics.sh --zookeeper zookeeper:2181 --describe --topic test
+
+## Produce messages to a test topic:
+
+docker exec f88c7614beee /opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+
+## Consume messages from a test topic:
+
+docker exec f88c7614beee /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+
+
 kafka-docker
 ============
 
