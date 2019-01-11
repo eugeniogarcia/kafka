@@ -29,7 +29,7 @@ public class KafkaConsumerConfig {
 		final Map<String, Object> props = new HashMap<>();
 		//Dirección del nodo
 		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-		//Usaremos este grupo para el consumidor. El grupo es el topic usado por el productor
+		//Usaremos este grupo para el consumidor
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
 		//Serializadores para la clave y el valor. Esperamos un string
 		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -69,6 +69,14 @@ public class KafkaConsumerConfig {
 		return factory;
 	}
 
+	//Consume en el grupo partitions
+	@Bean
+	public ConcurrentKafkaListenerContainerFactory<String, String> partitionsKafkaListenerContainerFactoryAll() {
+		final ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(consumerFactory("partitionsAll"));
+		return factory;
+	}
+
 	//Consume en el grupo filter
 	//Este listener filtra mensajes
 	@Bean
@@ -86,7 +94,7 @@ public class KafkaConsumerConfig {
 		final Map<String, Object> props = new HashMap<>();
 		//Dirección del nodo
 		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-		//Usaremos este grupo para el consumidor. Es otro grupo diferente. El grupo es el topic usado por el productor
+		//Usaremos este grupo para el consumidor. Es otro grupo diferente
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, "greeting");
 		//Serializadores para la clave y el valor. Esperamos un string en la clave, pero un JSON en el valor
 		return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(Greeting.class));

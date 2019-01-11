@@ -1,25 +1,31 @@
-# Before starting
-When building the docker compose we´ll get an error unless we do this before cloning the repo:
-
-git config --global core.autocrlf false
+# Before starting  
+When building the docker compose we´ll get an error unless we do this before cloning the repo:  
+git config --global core.autocrlf false  
 
 Then we can clone the repo.
 
-#How to check that the setup is right
-## Create and verify a topic:
+#How to check that the setup is right  
+We can create the topics, publish data, and subscribe to topics, using the command line utilities included with Kafka. Here we show how to run them on this Kafka docker container:
 
-docker exec f88c7614beee /opt/kafka/bin/kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic test
+## Create and verify a topic  
 
-docker exec f88c7614beee /opt/kafka/bin/kafka-topics.sh --zookeeper zookeeper:2181 --describe --topic test
+docker exec f88c7614beee /opt/kafka/bin/kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic test  
 
-## Produce messages to a test topic:
+docker exec f88c7614beee /opt/kafka/bin/kafka-topics.sh --zookeeper zookeeper:2181 --describe --topic test  
 
-docker exec f88c7614beee /opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+## Produce messages to a test topic  
 
-## Consume messages from a test topic:
+docker exec f88c7614beee /opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test  
 
-docker exec f88c7614beee /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+## Consume messages from a test topic  
 
+docker exec f88c7614beee /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning  
+
+# Starting and Stoping the container  
+Based on the experience of using the container, after we stop the container, we should remove the containers with  
+
+docker-compose stop  
+docker rm  
 
 kafka-docker
 ============
