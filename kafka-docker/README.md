@@ -1,10 +1,10 @@
 # Before starting  
-When building the docker compose we´ll get an error unless we do this before cloning the repo:  
+When building the docker compose we`ll get an error unless we do this before cloning the repo:  
 git config --global core.autocrlf false  
 
 Then we can clone the repo.
 
-#How to check that the setup is right  
+# How to check that the setup is right  
 We can create the topics, publish data, and subscribe to topics, using the command line utilities included with Kafka. Here we show how to run them on this Kafka docker container:
 
 ## Create and verify a topic  
