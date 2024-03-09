@@ -27,9 +27,6 @@ Based on the experience of using the container, after we stop the container, we 
 docker-compose stop  
 docker rm  
 
-kafka-docker
-============
-
 Dockerfile for [Apache Kafka](http://kafka.apache.org/)
 
 ## Pre-Requisites
