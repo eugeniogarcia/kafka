@@ -163,5 +163,115 @@ public ConcurrentKafkaListenerContainerFactory<String, String> filterKafkaListen
 
 ## Aplicacion
 
+Obtenemos directamente las dos beans que usaremos para producir y consumir mensajes - en lugar de inyectarlas:
 
+```java
+final MessageProducer producer = context.getBean(MessageProducer.class);
+final MessageListener listener = context.getBean(MessageListener.class);
+```
 
+Estas dos beans se han declarado en la propia aplicación
+
+```java
+@Bean
+public MessageProducer messageProducer() {
+    return new MessageProducer();
+}
+
+@Bean
+public MessageListener messageListener() {
+    return new MessageListener();
+}
+```
+
+### Producer
+
+En el producer inyectamos la bean con el template kafka a una variable:
+
+```java
+@Autowired
+private KafkaTemplate<String, String> kafkaTemplate;
+@Autowired
+private KafkaTemplate<String, Greeting> greetingKafkaTemplate;
+```
+
+inyectamos las propiedades desde nuestro archivo de configuración:
+
+```java
+// Tenemos varios topicos
+@Value(value = "${message.topic.name}")
+private String topicName;
+
+@Value(value = "${partitioned.topic.name}")
+private String partionedTopicName;
+
+@Value(value = "${filtered.topic.name}")
+private String filteredTopicName;
+
+@Value(value = "${greeting.topic.name}")
+private String greetingTopicName;
+```
+
+y se declaran los helpers para producir mensajes:
+
+- envio de un mensaje a un topico:
+
+```java
+@SuppressWarnings("null")
+public void sendMessage(String message) {
+    kafkaTemplate.send(topicName, message);
+}
+```
+
+- envio de un mensaje a un topico particionado. Indicamos cual es la key y kafka determinará cual es la partición destino a partir del valor de la key:
+
+```java
+@SuppressWarnings("null")
+public void sendMessageToPartioned(String key, String message) {
+    kafkaTemplate.send(partionedTopicName, key, message);
+}
+```
+
+- envio de un mensaje a una particion concreta de un topico - en lugar de indicar una key y que kafka seleccione la partición a partir de la key, forzamos que se envie a una partición concreta:
+
+```java
+@SuppressWarnings("null")
+public void sendMessageToPartion(String message, int partition) {
+    kafkaTemplate.send(partionedTopicName, partition, null, message);
+}
+```
+
+### Listener
+
+Para consumir mensajes crearemos unos listener que estarán continuamente monitorizando la llegada de nuevos mensajes a Kafka para consumirles.
+
+El listener tiene que:
+
+- indicar el topic al que queremos subscribirnos
+- la factoría que vamos a utilizar. En la factoría estamos indicando:
+    - el __groupid__ que identifica al listener. Podemos tener varios programas (procesos, hilos, aplicaciones) consumiendo mensajes de un mismo topic. Todos aquellos que esten identificados con el mismo grouid se tratan como parte de un mismo grupo, de modo que se garantice que un determinado mensaje solo sea consumido por uno de los participantes del grupo
+    - __serializadores__ para el key y el valor
+    - __filtros__ a aplicar
+    - direcion del __broker server__
+
+```java
+@KafkaListener(topics = "${greeting.topic.name}", containerFactory = "greetingKafkaListenerContainerFactory")
+public void greetingListener(Greeting greeting) {
+    System.out.println("------------------------------");
+    System.out.println("Recieved greeting message: " + greeting);
+    System.out.println("------------------------------");
+    this.greetingLatch.countDown();
+}
+```
+
+Podemos también indicar en la anotación el __groupid__.
+
+### Otros
+
+En la aplicación se define un Latch, en este ejemplo inicializado a 3.
+
+```java
+private final CountDownLatch latch = new CountDownLatch(3);
+```
+
+con `latch.countDown()` decrementamos el valor del latch. Si el valor resultante es mayor que cero, el thread se bloquea, hasta que valor llegue a cero. Si el valor resultante es cero, la ejecución continua al tiempo que se desbloquean otros threads que pudieran estar bloqueados. Si el latch ya estaba en cero, no sucede nada, la ejecución continua.
