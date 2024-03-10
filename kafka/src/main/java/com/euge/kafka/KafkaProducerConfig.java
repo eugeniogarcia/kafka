@@ -16,44 +16,51 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 @Configuration
 public class KafkaProducerConfig {
 
-	//Dirección del nodo de Kafka
+	// Dirección del nodo de Kafka
 	@Value(value = "${kafka.bootstrapAddress}")
 	private String bootstrapAddress;
 
-	//Configuración del Productor
+	// Configuración del Productor
 	@Bean
 	public ProducerFactory<String, String> producerFactory() {
 		final Map<String, Object> configProps = new HashMap<>();
-		//Dirección
+		// Dirección
 		configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-		//Serializador para la clave y el valor
+		// Serializador para la clave y el valor
 		configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		return new DefaultKafkaProducerFactory<>(configProps);
 	}
 
-	//Configura el template de Kafka
+	// Configura el template de Kafka
 	@Bean
 	public KafkaTemplate<String, String> kafkaTemplate() {
-		//Configura el template usando la configuración definida en la bean anterior
-		return new KafkaTemplate<>(producerFactory());
+		// Configura el template usando la configuración definida en la bean anterior
+		ProducerFactory<String, String> factoria = producerFactory();
+		if (factoria == null)
+			throw new RuntimeException("no se ha creado la factoria");
+		return new KafkaTemplate<String, String>(factoria);
 	}
 
-	//Configuración otro Productor, este usando un JSON en el formato usado en el valor
+	// Configuración otro Productor, este usando un JSON en el formato usado en el
+	// valor
 	@Bean
 	public ProducerFactory<String, Greeting> greetingProducerFactory() {
 		final Map<String, Object> configProps = new HashMap<>();
 		configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
 		configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-		//El valor no es un string en este productor, sino un JSON
+		// El valor no es un string en este productor, sino un JSON
 		configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-		return new DefaultKafkaProducerFactory<>(configProps);
+		return new DefaultKafkaProducerFactory<String, Greeting>(configProps);
 	}
 
-	//Configura otro template de Kafka
+	// Configura otro template de Kafka
 	@Bean
 	public KafkaTemplate<String, Greeting> greetingKafkaTemplate() {
-		return new KafkaTemplate<>(greetingProducerFactory());
+		ProducerFactory<String, Greeting> factoria = greetingProducerFactory();
+		if (factoria == null)
+			throw new RuntimeException("no se ha creado la factoria");
+		return new KafkaTemplate<String, Greeting>(factoria);
 	}
 
 }

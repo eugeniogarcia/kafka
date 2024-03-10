@@ -20,91 +20,116 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 @Configuration
 public class KafkaConsumerConfig {
 
-	//Dirección del nodo de Kafka
+	// Dirección del nodo de Kafka
 	@Value(value = "${kafka.bootstrapAddress}")
 	private String bootstrapAddress;
 
-	//Configuración para el consumidor
+	// Configuración para el consumidor
 	public ConsumerFactory<String, String> consumerFactory(String groupId) {
 		final Map<String, Object> props = new HashMap<>();
-		//Dirección del nodo
+		// Dirección del nodo
 		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-		//Usaremos este grupo para el consumidor
+		// Usaremos este grupo para el consumidor
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-		//Serializadores para la clave y el valor. Esperamos un string
+		// Serializadores para la clave y el valor. Esperamos un string
 		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		return new DefaultKafkaConsumerFactory<>(props);
 	}
 
-	//Consume en el grupo foo
+	// Consume en el grupo foo
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, String> fooKafkaListenerContainerFactory() {
 		final ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-		factory.setConsumerFactory(consumerFactory("foo"));
+		ConsumerFactory<String, String> factoria = consumerFactory("foo");
+		if (factoria == null)
+			throw new RuntimeException("no pudo crearse la factoria");
+		factory.setConsumerFactory(factoria);
 		return factory;
 	}
 
-	//Consume en el grupo bar
+	// Consume en el grupo bar
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, String> barKafkaListenerContainerFactory() {
 		final ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-		factory.setConsumerFactory(consumerFactory("bar"));
+		ConsumerFactory<String, String> factoria = consumerFactory("bar");
+		if (factoria == null)
+			throw new RuntimeException("no pudo crearse la factoria");
+		factory.setConsumerFactory(factoria);
 		return factory;
 	}
 
-	//Consume en el grupo headers
+	// Consume en el grupo headers
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, String> headersKafkaListenerContainerFactory() {
 		final ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-		factory.setConsumerFactory(consumerFactory("headers"));
+		ConsumerFactory<String, String> factoria = consumerFactory("headers");
+		if (factoria == null)
+			throw new RuntimeException("no pudo crearse la factoria");
+		factory.setConsumerFactory(factoria);
 		return factory;
 	}
 
-	//Consume en el grupo partitions
+	// Consume en el grupo partitions
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, String> partitionsKafkaListenerContainerFactory() {
 		final ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-		factory.setConsumerFactory(consumerFactory("partitions"));
+		ConsumerFactory<String, String> factoria = consumerFactory("partitions");
+		if (factoria == null)
+			throw new RuntimeException("no pudo crearse la factoria");
+		factory.setConsumerFactory(factoria);
 		return factory;
 	}
 
-	//Consume en el grupo partitions
+	// Consume en el grupo partitions
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, String> partitionsKafkaListenerContainerFactoryAll() {
 		final ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-		factory.setConsumerFactory(consumerFactory("partitionsAll"));
+		ConsumerFactory<String, String> factoria = consumerFactory("partitionsAll");
+		if (factoria == null)
+			throw new RuntimeException("no pudo crearse la factoria");
+		factory.setConsumerFactory(factoria);
 		return factory;
 	}
 
-	//Consume en el grupo filter
-	//Este listener filtra mensajes
+	// Consume en el grupo filter
+	// Este listener filtra mensajes
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, String> filterKafkaListenerContainerFactory() {
 		final ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-		factory.setConsumerFactory(consumerFactory("filter"));
-		//Filtra de modo que solo se consumiran por aqui mensajes que contengan el valor "World"
+		ConsumerFactory<String, String> factoria = consumerFactory("filter");
+		if (factoria == null)
+			throw new RuntimeException("no pudo crearse la factoria");
+		factory.setConsumerFactory(factoria);
+		// Filtra de modo que solo se consumiran por aqui mensajes que contengan el
+		// valor "World"
 		factory.setRecordFilterStrategy(record -> record.value()
 				.contains("World"));
 		return factory;
 	}
 
-	//Configuración otro consumidor, en este caso esperamos en el valor un JSON
+	// Configuración otro consumidor, en este caso esperamos en el valor un JSON
 	public ConsumerFactory<String, Greeting> greetingConsumerFactory() {
 		final Map<String, Object> props = new HashMap<>();
-		//Dirección del nodo
+		// Dirección del nodo
 		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-		//Usaremos este grupo para el consumidor. Es otro grupo diferente
+		// Usaremos este grupo para el consumidor. Es otro grupo diferente
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, "greeting");
-		//Serializadores para la clave y el valor. Esperamos un string en la clave, pero un JSON en el valor
-		return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(Greeting.class));
+		// Serializadores para la clave y el valor. Esperamos un string en la clave,
+		// pero un JSON en el valor
+		return new DefaultKafkaConsumerFactory<String, Greeting>(props,
+				new StringDeserializer(), new JsonDeserializer<>(Greeting.class));
 	}
 
-	//Consume mensajes de grupo greeting. Estos mensajes en el valor reciben un JSON
+	// Consume mensajes de grupo greeting. Estos mensajes en el valor reciben un
+	// JSON
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, Greeting> greetingKafkaListenerContainerFactory() {
-		final ConcurrentKafkaListenerContainerFactory<String, Greeting> factory = new ConcurrentKafkaListenerContainerFactory<>();
-		factory.setConsumerFactory(greetingConsumerFactory());
+		final ConcurrentKafkaListenerContainerFactory<String, Greeting> factory = new ConcurrentKafkaListenerContainerFactory<String, Greeting>();
+		ConsumerFactory<String, Greeting> factoria = greetingConsumerFactory();
+		if (factoria == null)
+			throw new RuntimeException("no pudo crearse la factoria");
+		factory.setConsumerFactory(factoria);
 		return factory;
 	}
 
