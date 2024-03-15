@@ -243,6 +243,13 @@ inter.broker.listener.name = INSIDE
 
 It uses the AWS metada service available on each EC2 instance to find out what is the name of the vm, and uses it as hostname.
 
+## Monitorización
+
+Para poder observar el cluster vamos a utilizar un par de opciones:
+
+- zoo navigator. Proporciona una imagen que escucha en el puerto 9000. Nos permite conectarnos al zookeeper y ver todos los metadatos que estan guardados
+
+- Offset Explorer. Aplicacion que nos permite conectarnos a los brokers de Kafka y al zookeeper
 
 ## JMX
 
