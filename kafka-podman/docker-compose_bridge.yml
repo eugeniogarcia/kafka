@@ -1,0 +1,90 @@
+---
+version: '2'
+services:
+  zookeeper-1:
+    image: docker.io/confluentinc/cp-zookeeper:latest
+    network_mode: bridge
+    ports:
+      - 2181:2181
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888
+
+  zookeeper-2:
+    image: docker.io/confluentinc/cp-zookeeper:latest
+    network_mode: bridge
+    ports:
+      - 2182:2181
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888
+
+  zookeeper-3:
+    image: docker.io/confluentinc/cp-zookeeper:latest
+    network_mode: bridge
+    ports:
+      - 2183:2181
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888
+
+  kafka-1:
+    image: docker.io/confluentinc/cp-kafka:latest
+    network_mode: bridge
+    ports:
+      - 9092:9092
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+      KAFKA_LISTENERS: INTERNO://kafka-1:9082,EXTERNO://kafka-1:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNO://kafka-1:9082,EXTERNO://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNO:PLAINTEXT,EXTERNO:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNO
+  kafka-2:
+    image: docker.io/confluentinc/cp-kafka:latest
+    network_mode: bridge
+    ports:
+      - 9093:9093
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+      KAFKA_LISTENERS: INTERNO://kafka-2:9082,EXTERNO://kafka-2:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNO://kafka-2:9082,EXTERNO://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNO:PLAINTEXT,EXTERNO:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNO
+  kafka-3:
+    image: docker.io/confluentinc/cp-kafka:latest
+    network_mode: bridge
+    ports:
+      - 9094:9094
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+      KAFKA_LISTENERS: INTERNO://kafka-3:9082,EXTERNO://kafka-3:9094
+      KAFKA_ADVERTISED_LISTENERS: INTERNO://kafka-3:9082,EXTERNO://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNO:PLAINTEXT,EXTERNO:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNO
