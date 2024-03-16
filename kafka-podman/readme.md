@@ -248,22 +248,33 @@ It uses the AWS metada service available on each EC2 instance to find out what i
 Para poder observar el cluster vamos a utilizar un par de opciones:
 
 - zoo navigator. Proporciona una imagen que escucha en el puerto 9000. Nos permite conectarnos al zookeeper y ver todos los metadatos que estan guardados
-
 - Offset Explorer. Aplicacion que nos permite conectarnos a los brokers de Kafka y al zookeeper
+- Usando Grafana
 
-## JMX
+### Grafana
 
-For monitoring purposes you may wish to configure JMX. Additional to the standard JMX parameters, problems could arise from the underlying RMI protocol used to connect
+Arrancamos la imagen de [grafana](https://grafana.com/docs/grafana/latest/setup-grafana/installation/docker/)
 
-* java.rmi.server.hostname - interface to bind listening port
-* com.sun.management.jmxremote.rmi.port - The port to service RMI requests
-
-For example, to connect to a kafka running locally (assumes exposing port 1099)
-
-```yaml
-KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1 -Dcom.sun.management.jmxremote.rmi.port=1099"
-JMX_PORT: 1099
+```ps
+podman run -d -p 3000:3000 --name=grafana grafana/grafana-oss
 ```
 
-Jconsole can now connect at ```jconsole 192.168.99.100:1099```
+para hacer el almancenamiento persistente creamos un volumen:
 
+```ps
+podman volume create grafana-storage
+
+podman volume inspect grafana-storage
+```
+
+```ps
+podman run -d -p 3000:3000 --name=grafana --volume grafana-storage:/var/lib/grafana grafana/grafana-oss
+```
+
+la primera vez que entremos en grafana el usuario y la contraseña son _admin_, _admin_.
+
+Podemos arrancar la imagen con plugins instalados usando la variable de entorno `GF_INSTALL_PLUGINS`. En nuestro caso instalamos el plugin de kafka:
+
+```ps
+podman run -d -p 3000:3000 --name=grafana -e "GF_INSTALL_PLUGINS=hamedkarbasi93-kafka-datasource" --volume grafana-storage:/var/lib/grafana grafana/grafana-oss
+```
