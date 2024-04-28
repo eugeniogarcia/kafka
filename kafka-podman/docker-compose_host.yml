@@ -79,3 +79,13 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNO:PLAINTEXT,EXTERNO:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNO
       KAFKA_ADVERTISED_HOST_NAME: 192.168.1.134
+
+  seguimiento:
+    image: docker.io/elkozmon/zoonavigator:latest
+    network_mode: host
+    ports:
+      - 9000:9000
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3

@@ -74,9 +74,8 @@ Hay creados dos archivos `docker-compose.yaml`. Cuando trabajamos en modo __host
 
 __Comentarios:__
 
-- Los puertos en cada contenedor no estan aislados unos de otros porque no estan aislados a nivel de red. No se hace forwarding de los puertos porque el contenedor tienen la misma ip que el host
-- Cada contenedor tiene su propia ip y esta aislada del resto de contenedores. Los puertos que se necesita exponer de cada contenedor solo son accesibles usando _port forwarding_
-
+- __Host__. Los puertos en cada contenedor no estan aislados unos de otros porque no estan aislados a nivel de red. No se hace forwarding de los puertos porque el contenedor tienen la misma ip que el host
+- __Bridge__. Cada contenedor tiene su propia ip y esta aislada del resto de contenedores. Los puertos que se necesita exponer de cada contenedor solo son accesibles usando _port forwarding_
 
 ## Configuracion
 
@@ -263,9 +262,10 @@ It uses the AWS metada service available on each EC2 instance to find out what i
 
 Para poder observar el cluster vamos a utilizar un par de opciones:
 
-- zoo navigator. Proporciona una imagen que escucha en el puerto 9000. Nos permite conectarnos al zookeeper y ver todos los metadatos que estan guardados
-- Offset Explorer. Aplicacion que nos permite conectarnos a los brokers de Kafka y al zookeeper
-- Usando Grafana
+- __zoo navigator__. Proporciona una imagen que escucha en el puerto 9000. Nos permite conectarnos al zookeeper y ver todos los metadatos que estan guardados. En los docker compose files esta incluida esta imagen. Nos conectamos en `localhost:9000`, como línea de conexión especificamos la ip asignada a la image de _zoo navigator_, por ejemplo `10.89.0.2:2181`
+
+- __Offset Explorer__. Aplicacion que nos permite conectarnos a los brokers de Kafka y al zookeeper
+- __Usando Grafana__
 
 ### Grafana
 

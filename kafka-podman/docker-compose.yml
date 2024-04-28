@@ -1,5 +1,5 @@
 ---
-version: '2'
+version: "2"
 services:
   zookeeper-1:
     image: docker.io/confluentinc/cp-zookeeper:latest
@@ -88,3 +88,13 @@ services:
       KAFKA_ADVERTISED_LISTENERS: INTERNO://kafka-3:9082,EXTERNO://localhost:9094
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNO:PLAINTEXT,EXTERNO:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNO
+
+  seguimiento:
+    image: docker.io/elkozmon/zoonavigator:latest
+    network_mode: bridge
+    ports:
+      - 9000:9000
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
