@@ -1,3 +1,19 @@
+# Introducción
+
+Arrancamos Kafka con Zookeeper en dos modalidades, de forma individual y en modo cluster.
+
+## Troubleshooting
+
+### Podman automatically sets cniVersion 1.0.0 instead of 0.4.0
+
+Editar el archivo de configuración para sustitutir la versión `"cniVersion": "1.0.0"` por la `"cniVersion": "0.4.0"`.
+
+A continuación hacer para que se resetee el podman y tome este cambio:
+
+```ps
+podman system reset --force
+```
+
 ## Arrancar Kafka
 
 ### Individual
